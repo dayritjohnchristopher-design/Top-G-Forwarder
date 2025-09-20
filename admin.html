@@ -3,92 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <title>Admin - Top-G Forwarder</title>
+  <!-- Firebase compat SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body class="bg-light">
   <div class="container py-5">
-    <h1 class="mb-4">Admin - Add/Update Tracking</h1>
-    <div class="mb-3">
-      <label class="form-label">Tracking Number</label>
-      <input type="text" id="trackingNum" class="form-control" placeholder="Tracking Number">
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Status</label>
-      <input type="text" id="status" class="form-control" placeholder="Status (e.g. In Transit)">
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Location</label>
-      <input type="text" id="location" class="form-control" placeholder="Location">
-    </div>
-    <button onclick="saveTracking()" class="btn btn-success">Save</button>
-    <hr>
-    <div id="result"></div>
-  </div>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDo73vN9SU08bLoeHs1U9I-PDBX5kDoSsE",
-      authDomain: "top-g-forwarder.firebaseapp.com",
-      projectId: "top-g-forwarder",
-      storageBucket: "top-g-forwarder.firebasestorage.app",
-      messagingSenderId: "79738605812",
-      appId: "1:79738605812:web:dabbd01812023936bfcea1",
-      measurementId: "G-SJGNXNN89Q"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    async function saveTracking(){
-      const num = document.getElementById('trackingNum').value.trim();
-      const status = document.getElementById('status').value.trim();
-      const location = document.getElementById('location').value.trim();
-      if(!num){alert('Enter tracking number'); return;}
-      await db.collection('tracking').doc(num).set({
-        status: status,
-        location: location,
-        updated: new Date().toLocaleString()
-      });
-      document.getElementById('result').innerHTML = "<p class='text-success'>Saved/Updated successfully!</p>";
-    }
-  </script>
-<script type="module">
-  // Firebase SDK
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
-  // Firebase config mo
-  const firebaseConfig = {
-    apiKey: "AIzaSyDo73vN9SU08bLoeHs1U9I-PDBX5kDoSsE",
-    authDomain: "top-g-forwarder.firebaseapp.com",
-    projectId: "top-g-forwarder",
-    storageBucket: "top-g-forwarder.firebasestorage.app",
-    messagingSenderId: "79738605812",
-    appId: "1:79738605812:web:dabbd01812023936bfcea1",
-    measurementId: "G-SJGNXNN89Q"
-  };
-
-  // init app + firestore
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  // form submit handler
-  document.getElementById("trackingForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const trackingNumber = document.getElementById("trackingNumber").value;
-    const status = document.getElementById("status").value;
-    const location = document.getElementById("location").value;
-
-    await setDoc(doc(db, "tracking", trackingNumber), {
-      status: status,
-      location: location,
-      updatedAt: new Date()
-    });
-
-    alert("Saved/Updated successfully!");
-    e.target.reset();
-  });
-</script>
-</body>
-</html> 
+    <h1 class="mb-4">Admin Page – Add / Update Tracking</h1>
+    <form id="trackingForm">
+      <div class="mb-3">
+        <label class="form-label">Tracking Number</label>
+        <input type="text" id="trackingNumber" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Status</label>
+        <input type="text" id="status" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Location</label>
+        <input type="text" id="location" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-success">
