@@ -1,64 +1,92 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Top-G Forwarder Tracking</title>
-  <!-- Firebase compat SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <title>Tracking System</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    input, button { padding: 8px; margin: 5px 0; width: 300px; }
+    #trackingResult { margin-top: 20px; font-weight: bold; }
+  </style>
 </head>
-<body class="bg-light">
-  <div class="container py-5">
-    <h1 class="mb-4">Top-G Forwarder Tracking</h1>
-    <div class="mb-3">
-      <label class="form-label">Enter Tracking Number</label>
-      <input type="text" id="trackingInput" class="form-control" placeholder="Tracking Number">
-    </div>
-    <button onclick="searchTracking()" class="btn btn-primary">Search</button>
-    <hr>
-    <div id="result"></div>
-  </div>
+<body>
+  <h1>Update Tracking</h1>
+  <form id="trackingForm">
+    <input type="text" id="waybill" placeholder="Waybill Number" required><br>
+    <input type="text" id="status" placeholder="Status/Location" required><br>
+    <button type="submit">Update Tracking</button>
+  </form>
 
-  <script>
-    // Firebase config – same as admin.html
+  <h1>Search Tracking</h1>
+  <input type="text" id="searchWaybill" placeholder="Enter Waybill Number">
+  <div id="trackingResult">Search result will appear here</div>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+
+    // 🔹 Replace this config with your Firebase project config
     const firebaseConfig = {
-      apiKey: "AIzaSyDo73vN9SU08bLoeHs1U9I-PDBX5kDoSsE",
-      authDomain: "top-g-forwarder.firebaseapp.com",
-      projectId: "top-g-forwarder",
-      storageBucket: "top-g-forwarder.firebasestorage.app",
-      messagingSenderId: "79738605812",
-      appId: "1:79738605812:web:dabbd01812023936bfcea1",
-      measurementId: "G-SJGNXNN89Q"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
 
     // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    // Function to search tracking info
-    async function searchTracking() {
-      const trackingNum = document.getElementById('trackingInput').value.trim();
-      const resultDiv = document.getElementById('result');
+    // Handle form submit
+    const form = document.getElementById('trackingForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const waybill = document.getElementById('waybill').value.trim();
+      const status = document.getElementById('status').value.trim();
+      if (!waybill || !status) return alert("Please fill in all fields");
 
-      if (!trackingNum) {
-        resultDiv.innerHTML = `<p class="text-danger">Please enter a tracking number.</p>`;
+      try {
+        await setDoc(doc(db, "trackings", waybill), {
+          status: status,
+          updatedAt: serverTimestamp()
+        });
+        alert("Tracking updated successfully!");
+        form.reset();
+      } catch (err) {
+        console.error(err);
+        alert("Error saving tracking. Check console.");
+      }
+    });
+
+    // Handle search
+    const searchInput = document.getElementById('searchWaybill');
+    const resultDiv = document.getElementById('trackingResult');
+
+    searchInput.addEventListener('input', async (e) => {
+      const waybill = e.target.value.trim();
+      if (!waybill) {
+        resultDiv.innerText = "Search result will appear here";
         return;
       }
 
       try {
-        const docRef = db.collection('tracking').doc(trackingNum);
-        const docSnap = await docRef.get();
-        if (docSnap.exists) {
+        const docRef = doc(db, "trackings", waybill);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
           const data = docSnap.data();
-          resultDiv.innerHTML = `
-            <h4>Status: ${data.status}</h4>
-            <p>Location: ${data.location}</p>
-            <p>Last Updated: ${data.updated}</p>
-          `;
+          const date = data.updatedAt?.toDate()?.toLocaleString() || "Unknown";
+          resultDiv.innerText = `Status: ${data.status}\nLast Updated: ${date}`;
         } else {
-          resultDiv.innerHTML = `<p class="text-danger">Tracking number not found.</p>`;
+          resultDiv.innerText = "Waybill not found.";
         }
       } catch (err) {
         console.error(err);
-        resultDiv.innerHTML = `<p class="text-danger">
+        resultDiv.innerText = "Error fetching tracking info.";
+      }
+    });
+  </script>
+</body>
+</html>
