@@ -1,0 +1,8 @@
+const firebaseConfig = {
+  apiKey: "AIza...yourKey",
+  authDomain: "yourapp.firebaseapp.com",
+  projectId: "yourapp",
+  storageBucket: "yourapp.appspot.com",
+  messagingSenderId: "12345",
+  appId: "1:12345:web:abc"
+};
