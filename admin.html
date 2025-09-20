@@ -53,5 +53,42 @@
       document.getElementById('result').innerHTML = "<p class='text-success'>Saved/Updated successfully!</p>";
     }
   </script>
+<script type="module">
+  // Firebase SDK
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+  // Firebase config mo
+  const firebaseConfig = {
+    apiKey: "AIzaSyDo73vN9SU08bLoeHs1U9I-PDBX5kDoSsE",
+    authDomain: "top-g-forwarder.firebaseapp.com",
+    projectId: "top-g-forwarder",
+    storageBucket: "top-g-forwarder.firebasestorage.app",
+    messagingSenderId: "79738605812",
+    appId: "1:79738605812:web:dabbd01812023936bfcea1",
+    measurementId: "G-SJGNXNN89Q"
+  };
+
+  // init app + firestore
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // form submit handler
+  document.getElementById("trackingForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const trackingNumber = document.getElementById("trackingNumber").value;
+    const status = document.getElementById("status").value;
+    const location = document.getElementById("location").value;
+
+    await setDoc(doc(db, "tracking", trackingNumber), {
+      status: status,
+      location: location,
+      updatedAt: new Date()
+    });
+
+    alert("Saved/Updated successfully!");
+    e.target.reset();
+  });
+</script>
 </body>
 </html>
