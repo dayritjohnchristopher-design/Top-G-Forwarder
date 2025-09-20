@@ -48,5 +48,41 @@
       }
     }
   </script>
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDo73vN9SU08bLoeHs1U9I-PDBX5kDoSsE",
+    authDomain: "top-g-forwarder.firebaseapp.com",
+    projectId: "top-g-forwarder",
+    storageBucket: "top-g-forwarder.firebasestorage.app",
+    messagingSenderId: "79738605812",
+    appId: "1:79738605812:web:dabbd01812023936bfcea1",
+    measurementId: "G-SJGNXNN89Q"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  document.getElementById("searchForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const trackingNumber = document.getElementById("searchTrackingNumber").value;
+    const docRef = doc(db, "tracking", trackingNumber);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      document.getElementById("result").innerText =
+        `Status: ${data.status}\nLocation: ${data.location}`;
+    } else {
+      document.getElementById("result").innerText = "No record found!";
+    }
+  });
+</script>
 </body>
-</html>
+</html><form id="searchForm">
+  <input type="text" id="searchTrackingNumber" placeholder="Enter Tracking Number" required>
+  <button type="submit">Search</button>
+</form>
+<pre id="result"></pre>
