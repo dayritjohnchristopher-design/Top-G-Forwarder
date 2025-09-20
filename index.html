@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>Top-G Forwarder Tracking</title>
-  <!-- Firebase compat SDK -->
+  <!-- Firebase compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-  <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body class="bg-light">
@@ -22,7 +21,7 @@
   </div>
 
   <script>
-    // Firebase config
+    // Firebase config – same as admin.html
     const firebaseConfig = {
       apiKey: "AIzaSyDo73vN9SU08bLoeHs1U9I-PDBX5kDoSsE",
       authDomain: "top-g-forwarder.firebaseapp.com",
@@ -33,29 +32,33 @@
       measurementId: "G-SJGNXNN89Q"
     };
 
-    // init firebase
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    async function searchTracking(){
+    // Function to search tracking info
+    async function searchTracking() {
       const trackingNum = document.getElementById('trackingInput').value.trim();
-      if(!trackingNum){
-        document.getElementById('result').innerHTML = "<p class='text-danger'>Please enter tracking number.</p>";
+      const resultDiv = document.getElementById('result');
+
+      if (!trackingNum) {
+        resultDiv.innerHTML = `<p class="text-danger">Please enter a tracking number.</p>`;
         return;
       }
-      const docRef = db.collection('tracking').doc(trackingNum);
-      const docSnap = await docRef.get();
-      if(docSnap.exists){
-        const data = docSnap.data();
-        document.getElementById('result').innerHTML = `
-          <h4>Status: ${data.status}</h4>
-          <p>Location: ${data.location}</p>
-          <p>Last Updated: ${data.updatedAt ? data.updatedAt.toDate() : ''}</p>
-        `;
-      } else {
-        document.getElementById('result').innerHTML = "<p class='text-danger'>Tracking number not found.</p>";
-      }
-    }
-  </script>
-</body>
-</html>
+
+      try {
+        const docRef = db.collection('tracking').doc(trackingNum);
+        const docSnap = await docRef.get();
+        if (docSnap.exists) {
+          const data = docSnap.data();
+          resultDiv.innerHTML = `
+            <h4>Status: ${data.status}</h4>
+            <p>Location: ${data.location}</p>
+            <p>Last Updated: ${data.updated}</p>
+          `;
+        } else {
+          resultDiv.innerHTML = `<p class="text-danger">Tracking number not found.</p>`;
+        }
+      } catch (err) {
+        console.error(err);
+        resultDiv.innerHTML = `<p class="text-danger">
