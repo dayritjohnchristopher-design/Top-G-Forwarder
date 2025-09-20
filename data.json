@@ -1,0 +1,14 @@
+[
+  {
+    "trackingNumber": "123456789",
+    "status": "In Transit",
+    "location": "Los Angeles, USA",
+    "lastUpdate": "2025-09-20"
+  },
+  {
+    "trackingNumber": "987654321",
+    "status": "Delivered",
+    "location": "New York, USA",
+    "lastUpdate": "2025-09-18"
+  }
+]
