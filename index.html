@@ -1,87 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Top-G Forwarder Parcel Tracking</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #007BFF;
-      color: #fff;
-      padding: 15px;
-      text-align: center;
-    }
-    .container {
-      max-width: 600px;
-      margin: 30px auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    button {
-      padding: 10px 20px;
-      background: #007BFF;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .result {
-      margin-top: 20px;
-      padding: 10px;
-      background: #f1f1f1;
-      border-radius: 5px;
-    }
-  </style>
+  <title>Top-G Forwarder Tracking</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
-<body>
-  <header>
-    <h1>Top-G Forwarder Parcel Tracking</h1>
-  </header>
-  <div class="container">
-    <input type="text" id="trackingNumber" placeholder="Enter Tracking Number">
-    <button onclick="trackParcel()">Track</button>
-    <div id="result" class="result"></div>
+<body class="bg-light">
+  <div class="container py-5">
+    <h1 class="mb-4">Top-G Forwarder Tracking</h1>
+    <div class="mb-3">
+      <label class="form-label">Enter Tracking Number</label>
+      <input type="text" id="trackingInput" class="form-control" placeholder="Tracking Number">
+    </div>
+    <button onclick="searchTracking()" class="btn btn-primary">Search</button>
+    <hr>
+    <div id="result"></div>
   </div>
 
   <script>
-    async function trackParcel() {
-      const trackingNumber = document.getElementById('trackingNumber').value.trim();
-      const resultDiv = document.getElementById('result');
-      if (!trackingNumber) {
-        resultDiv.textContent = "Please enter a tracking number.";
-        return;
-      }
+    const firebaseConfig = {
+      apiKey: "AIzaSyDo73vN9SU08bLoeHs1U9I-PDBX5kDoSsE",
+      authDomain: "top-g-forwarder.firebaseapp.com",
+      projectId: "top-g-forwarder",
+      storageBucket: "top-g-forwarder.firebasestorage.app",
+      messagingSenderId: "79738605812",
+      appId: "1:79738605812:web:dabbd01812023936bfcea1",
+      measurementId: "G-SJGNXNN89Q"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-      try {
-        const response = await fetch('data.json');
-        const parcels = await response.json();
-        const parcel = parcels.find(p => p.trackingNumber === trackingNumber);
-        if (parcel) {
-          resultDiv.innerHTML = `
-            <strong>Status:</strong> ${parcel.status}<br>
-            <strong>Location:</strong> ${parcel.location}<br>
-            <strong>Last Update:</strong> ${parcel.lastUpdate}
-          `;
-        } else {
-          resultDiv.textContent = "Tracking number not found.";
-        }
-      } catch (error) {
-        resultDiv.textContent = "Error loading parcel data.";
+    async function searchTracking(){
+      const trackingNum = document.getElementById('trackingInput').value.trim();
+      const docRef = db.collection('tracking').doc(trackingNum);
+      const docSnap = await docRef.get();
+      if(docSnap.exists){
+        const data = docSnap.data();
+        document.getElementById('result').innerHTML = `
+          <h4>Status: ${data.status}</h4>
+          <p>Location: ${data.location}</p>
+          <p>Last Updated: ${data.updated}</p>
+        `;
+      } else {
+        document.getElementById('result').innerHTML = "<p class='text-danger'>Tracking number not found.</p>";
       }
     }
   </script>
